@@ -57,8 +57,10 @@ public class Main {
         printMatrix(inputMatrix);
         System.out.println();
 
-        Gauss[] threads = new Gauss[rows];
+        Gauss[] threads = new Gauss[NUM_THREADS];
         for (int i = 0; i < rows - 1; i++) {
+            int aux = 0;
+            int threadNumber = 0;
             for (int j = i + 1; j < rows; j++) {
                 double ratio = inputMatrix[j][i] / inputMatrix[i][i];
                 ratio = roundOff(ratio);
@@ -66,14 +68,27 @@ public class Main {
                 System.out.println(ratio);
                 System.out.println();
 
-                threads[j] = new Gauss(inputMatrix, i, j, rows, columns, ratio);
-                threads[j].start();
-
+                if (threadNumber + 1 == NUM_THREADS) {
+                    if (aux + 1 == NUM_THREADS) aux = 0;
+                    try {
+                        threads[aux].join();
+                    } catch (InterruptedException e) {
+                        System.out.println("Erro aqui");
+                        e.printStackTrace();
+                    }
+                    aux++;
+                    threadNumber = 0;
+                }
+                threads[threadNumber] = new Gauss(inputMatrix, i, j, rows, columns, ratio);
+                threads[threadNumber].start();
+                threadNumber++;
             }
-            for (int k = i + 1; k < rows; k++) {
+            for (int k = 0 ; k < NUM_THREADS; k++) {
                 try {
-                    threads[k].join();
+                    if (threads[k] != null)
+                        threads[k].join();
                 } catch (InterruptedException e) {
+                    System.out.println("Erro no fim da execução");
                     e.printStackTrace();
                 }
             }

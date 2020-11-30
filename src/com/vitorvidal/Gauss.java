@@ -15,8 +15,9 @@ public class Gauss extends Thread {
         this.rows = rows;
         this.columns = columns;
         this.ratio = ratio;
-    }
 
+        System.out.println("Inicializando Thread");
+    }
 
     public void run() {
         for (int k = i; k < rows; k++) {
